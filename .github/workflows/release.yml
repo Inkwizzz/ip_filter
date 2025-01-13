@@ -6,68 +6,28 @@ on:
       - master
       - feature/github_actions
 
-permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  actions: write
-  packages: write
-  id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
         with:
           submodules: true
-
-      # Устанавливаем зависимости
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libboost-test-dev cmake
-
-      # Устанавливаем CMake (если нужно)
-      - name: Install latest CMake
-        run: |
-          sudo apt-get install -y wget
-          wget https://github.com/Kitware/CMake/releases/download/v3.23.1/cmake-3.23.1-linux-x86_64.sh
-          sudo mkdir /opt/cmake
-          sudo sh cmake-3.23.1-linux-x86_64.sh --prefix=/opt/cmake --skip-license
-          # Проверяем, существует ли символическая ссылка, и если да, удаляем её
-          if [ -f /usr/local/bin/cmake ]; then
-            sudo rm /usr/local/bin/cmake
-          fi
-          sudo ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
-
-      # Генерация и сборка проекта
-      - name: Configure CMake
-        run: cmake . -DPATCH_VERSION=${{ github.run_number }}
-
-      - name: Build project
-        run: cmake --build . --config Release
-
-      - name: Package project
-        run: cmake --build . --target package
-
-      # Добавляем шаг для вывода содержимого текущего каталога
-      - name: List files in the directory
-        run: ls -alh
-
-      # Создание релиза
+      - run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
+      - run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DWITH_BOOST_TEST=ON
+      - run: cmake --build .
+      - run: cmake --build . --target test
+      - run: cmake --build . --target package
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ github.run_number }}
+          tag_name: ${{ github.run_number }}
           release_name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
-
-      # Загрузка артефактов в релиз
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
