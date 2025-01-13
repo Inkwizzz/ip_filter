@@ -71,7 +71,7 @@ auto Split(const std::string &str, char d) -> std::vector<std::string> {
     return r;
 }
 
-int main(int argc, char const *argv[])
+int main()
 {
     try
     {
