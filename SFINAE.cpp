@@ -6,37 +6,54 @@
 #include <type_traits>
 #include <string>
 
-//Check if container
+////Check if container
+//template<typename T>
+//struct is_container {
+//private:
+//    template<typename U>
+//    static auto test(int) -> decltype(
+//        std::declval<U>().begin(),
+//        std::declval<U>().end(),
+//        std::true_type{}
+//        );
+//
+//    template<typename>
+//    static std::false_type test(...);
+//
+//public:
+//    static constexpr bool value =
+//        decltype(test<T>(0))::value &&
+//        !std::is_convertible_v<T, std::string>;
+//};
+//
+////SFINAE for containers
+//template<typename T>
+//std::enable_if_t<is_container<T>::value>
+//print_ip(const T& container) {
+//    auto it = container.begin();
+//    if (it != container.end()) {
+//        std::cout << *it;
+//        ++it;
+//    }
+//    for (; it != container.end(); ++it) {
+//        std::cout << "." << *it;
+//    }
+//    std::cout << std::endl;
+//}
 template<typename T>
-struct is_container {
-private:
-    template<typename U>
-    static auto test(int) -> decltype(
-        std::declval<U>().begin(),
-        std::declval<U>().end(),
-        std::true_type{}
-        );
-
-    template<typename>
-    static std::false_type test(...);
-
-public:
-    static constexpr bool value =
-        decltype(test<T>(0))::value &&
-        !std::is_convertible_v<T, std::string>;
-};
-
-//SFINAE for containers
-template<typename T>
-std::enable_if_t<is_container<T>::value>
-print_ip(const T& container) {
-    auto it = container.begin();
-    if (it != container.end()) {
-        std::cout << *it;
-        ++it;
-    }
-    for (; it != container.end(); ++it) {
-        std::cout << "." << *it;
+auto print_ip(const T& container)
+-> decltype(
+    container.begin(),
+    container.end(),
+    std::enable_if_t<
+    !std::is_same_v<T, std::string> &&
+    !std::is_convertible_v<T, const char*>
+    >()
+    )
+{
+    for (auto i = container.begin(); i != container.end(); ++i) {
+        if (i != container.begin()) std::cout << '.';
+        std::cout << *i;
     }
     std::cout << std::endl;
 }
