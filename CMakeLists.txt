@@ -1,31 +1,31 @@
 ﻿cmake_minimum_required(VERSION 3.29)
 
-set(PATCH_VERSION "2" CACHE INTERNAL "Patch version")
-set(PROJECT_VERSION 0.2.${PATCH_VERSION})
+set(PATCH_VERSION "3" CACHE INTERNAL "Patch version")
+set(PROJECT_VERSION 0.3.${PATCH_VERSION})
 
-project(Allocator_cmake VERSION ${PROJECT_VERSION})
+project(SFINAE VERSION ${PROJECT_VERSION})
 
 option(WITH_BOOST_TEST "Whether to build Boost test" ON)
 
-add_executable(Allocator_cmake_cli Allocator_cmake.cpp)
+add_executable(SFINAE_cli SFINAE.cpp)
 
-set_target_properties(Allocator_cmake_cli PROPERTIES
+set_target_properties(SFINAE_cli PROPERTIES
         CXX_STANDARD 20
         CXX_STANDARD_REQUIRED ON
 )
 
-target_include_directories(Allocator_cmake_cli
+target_include_directories(SFINAE_cli
         PRIVATE "${CMAKE_BINARY_DIR}"
 )
 
 
 if (MSVC)
-    target_compile_options(Allocator_cmake_cli PRIVATE /W4)
+    target_compile_options(SFINAE_cli PRIVATE /W4)
 else()
-    target_compile_options(Allocator_cmake_cli PRIVATE -Wall -Wextra -pedantic)
+    target_compile_options(SFINAE_cli PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-install(TARGETS Allocator_cmake_cli RUNTIME DESTINATION bin)
+install(TARGETS SFINAE_cli RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
