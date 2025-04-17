@@ -127,7 +127,7 @@ public:
     };
 
     MyList() = default;
-    MyList(const alloc& alloc) : allocator(alloc) {}
+    MyList(const alloc& alloca) : allocator(alloca) {}
 
     ~MyList() {
         clear();
